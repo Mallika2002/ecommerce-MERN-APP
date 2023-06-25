@@ -17,7 +17,7 @@ const orderData = require("./orders")
 const Order = require("../models/OrderModel")
 
 const importData = async () => {
-    try{
+    try {
         await Category.collection.dropIndexes() //=> delete all existing indexes
         await Product.collection.dropIndexes()
 
@@ -27,23 +27,29 @@ const importData = async () => {
         await User.collection.deleteMany({})
         await Order.collection.deleteMany({})
 
-        await Category.insertMany(categoryData) //insert new data
-        const reviews = await Review.insertMany(reviewData)
-        const sampleProducts = productData.map((product) => {
-            reviews.map((review) => {
-                product.reviews.push(review._id)
+        if (process.argv[2] !== "-d") { //if we pass -d as argument then we will delete all data and exit
+            await Category.insertMany(categoryData) //insert new data
+            const reviews = await Review.insertMany(reviewData)
+            const sampleProducts = productData.map((product) => {
+                reviews.map((review) => {
+                    product.reviews.push(review._id)
+                })
+                return { ...product }
             })
-            return {...product}
-        })
-        await Product.insertMany(sampleProducts)
-        await User.insertMany(userData)
-        await Order.insertMany(orderData)
-        
-        console.log("Seeder data proceeeded successfully")
+            await Product.insertMany(sampleProducts)
+            await User.insertMany(userData)
+            await Order.insertMany(orderData)
+
+            console.log("Seeder data imported successfully")
+            process.exit()
+            return
+        }
+        console.log("Seeder data deleted successfully")
         process.exit()
-    }catch(error){
-        console.log("Error while processing seeder data",error)
+    } catch (error) {
+        console.error("Error while processing seeder data", error)
         process.exit(1)
+
     }
 }
 
