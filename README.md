@@ -1,1 +1,1 @@
-This is a emcommerce application based on MERN Stack using AWS.
+This is a emcommerce application based on MERN Stack using AWS and automated the deployment using Jenkins.
